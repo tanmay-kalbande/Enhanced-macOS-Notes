@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css">
+    <link rel="icon" href="writing-tool.png" type="image/x-icon">
     <style>
         :root {
             --bg-color: #1f1f1f;
@@ -885,7 +886,64 @@
 
         // Convert Markdown-like syntax to HTML
         function convertToHTML(markdown) {
-            let html = markdown;
+            // First escape any HTML entities to prevent them from being rendered as HTML
+            function escapeHTML(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // Function to unescape HTML for code blocks
+            function unescapeHTML(html) {
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                return div.textContent;
+            }
+
+            let html = escapeHTML(markdown);
+
+            // Handle code blocks first (so we don't process markdown inside them)
+            const codeBlocks = [];
+            html = html.replace(/```([\s\S]*?)```/g, function(match, code) {
+                const id = `CODE_BLOCK_${codeBlocks.length}`;
+                // Detect language if specified
+                const firstLine = code.trim().split('\n')[0];
+                let language = '';
+                let codeContent = code;
+
+                if (firstLine && !firstLine.includes(' ')) {
+                    language = firstLine;
+                    codeContent = code.substring(firstLine.length).trim();
+                }
+
+                // Store the code block for later
+                codeBlocks.push({
+                    id: id,
+                    language: language,
+                    code: unescapeHTML(codeContent) // Use the raw code
+                });
+
+                // Return a placeholder
+                return id;
+            });
+
+            // Handle inline code
+            const inlineCode = [];
+            html = html.replace(/`([^`]+)`/g, function(match, code) {
+                const id = `INLINE_CODE_${inlineCode.length}`;
+                inlineCode.push({
+                    id: id,
+                    code: unescapeHTML(code)
+                });
+                return id;
+            });
+
+            // Process Markdown
+
+            // Headings
+            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
             // Bold
             html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -894,34 +952,46 @@
             html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
 
             // Underline
-            html = html.replace(/__(.+?)__/g, '<u>$1</u>');
-
-            // Headings
-            html = html.replace(/^### (.+)/gm, '<h3>$1</h3>');
-            html = html.replace(/^## (.+)/gm, '<h2>$1</h2>');
-            html = html.replace(/^# (.+)/gm, '<h1>$1</h1>');
+            html = html.replace(/\_\_(.+?)\_\_/g, '<u>$1</u>');
 
             // Blockquote
-            html = html.replace(/^> (.+)/gm, '<blockquote>$1</blockquote>');
+            html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
 
-            // Unordered List
-            html = html.replace(/^[-*] (.+)/gm, '<li>$1</li>');
-            html = html.replace(/<li>([\s\S]*?)<li>/gm, '<ul>$1</ul><li>');
-            html = html.replace(/^<li>([\s\S]*?)$/gm, '<ul>$1</ul>');
+            // Unordered lists
+            let listMatches = html.match(/^- (.+)$/gm);
+            if (listMatches) {
+                html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
+                html = html.replace(/(<li>.+<\/li>\n)+/g, '<ul>$&</ul>');
+            }
 
-            // Ordered List
-            html = html.replace(/^[0-9]+. (.+)/gm, '<li>$1</li>');
-            html = html.replace(/<li>([\s\S]*?)<li>/gm, '<ol>$1</ol><li>');
-            html = html.replace(/^<li>([\s\S]*?)$/gm, '<ol>$1</ol>');
-
-            // Inline Code
-            html = html.replace(/`(.+?)`/g, '<code>$1</code>');
-
-            // Code Block
-            html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+            // Ordered lists
+            listMatches = html.match(/^\d+\. (.+)$/gm);
+            if (listMatches) {
+                html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+                html = html.replace(/(<li>.+<\/li>\n)+/g, '<ol>$&</ol>');
+            }
 
             // Links
-            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+            html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
+
+            // Replace code block placeholders with actual HTML
+            codeBlocks.forEach(block => {
+                let codeHtml = '';
+                if (block.language) {
+                    codeHtml = `<pre><code class="language-${block.language}">${block.code}</code></pre>`;
+                } else {
+                    codeHtml = `<pre><code>${block.code}</code></pre>`;
+                }
+                html = html.replace(block.id, codeHtml);
+            });
+
+            // Replace inline code placeholders
+            inlineCode.forEach(code => {
+                html = html.replace(code.id, `<code>${code.code}</code>`);
+            });
+
+            // Handle line breaks properly
+            html = html.replace(/\n/g, '<br>');
 
             return html;
         }
@@ -929,19 +999,71 @@
         // Toggle between edit and preview modes
         function togglePreviewMode() {
             isPreviewMode = !isPreviewMode;
+
             if (isPreviewMode) {
-                // Convert content to HTML and display
-                const htmlContent = convertToHTML(noteContent.value);
-                noteContent.innerHTML = htmlContent;
-                noteContent.style.border = 'none';
-                noteContent.style.padding = '16px';
-                noteContent.style.cursor = 'default';
+                // Create a temporary div to hold the HTML content
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'note-content preview-mode';
+                previewDiv.style.flex = '1';
+                previewDiv.style.overflow = 'auto';
+                previewDiv.style.padding = '16px';
+
+                // Save the original textarea content
+                const originalContent = noteContent.value;
+                previewDiv.setAttribute('data-original', originalContent);
+
+                // Convert the content to HTML
+                previewDiv.innerHTML = convertToHTML(originalContent);
+
+                // Apply syntax highlighting to code blocks
+                previewDiv.querySelectorAll('pre code').forEach((block) => {
+                    Prism.highlightElement(block);
+                });
+
+                // Replace the textarea with our div
+                const parent = noteContent.parentNode;
+                parent.replaceChild(previewDiv, noteContent);
+                noteContent = previewDiv;
+
+                // Update button icon
+                previewButton.innerHTML = '<i class="fas fa-edit"></i>';
+                previewButton.title = 'Edit Note';
             } else {
-                // Switch back to edit mode
-                noteContent.value = noteContent.innerHTML;
-                noteContent.style.border = '';
-                noteContent.style.padding = '8px';
-                noteContent.style.cursor = 'text';
+                // Get the original content
+                const originalContent = noteContent.getAttribute('data-original');
+
+                // Create a new textarea and restore the original content
+                const editTextarea = document.createElement('textarea');
+                editTextarea.className = 'note-content';
+                editTextarea.style.flex = '1';
+                editTextarea.style.border = 'none';
+                editTextarea.style.resize = 'none';
+                editTextarea.style.background = 'none';
+                editTextarea.style.color = 'var(--text-primary)';
+                editTextarea.style.fontSize = '16px';
+                editTextarea.style.lineHeight = '1.7';
+                editTextarea.style.padding = '8px';
+                editTextarea.style.width = '100%';
+                editTextarea.placeholder = 'Start writing...';
+
+                // Set the value to the original markdown content
+                editTextarea.value = originalContent;
+
+                // Add the event listener for changes
+                editTextarea.addEventListener('input', () => {
+                    updateNote();
+                    updateWordCount();
+                    updateReadingTime();
+                });
+
+                // Replace the preview div with our textarea
+                const parent = noteContent.parentNode;
+                parent.replaceChild(editTextarea, noteContent);
+                noteContent = editTextarea;
+
+                // Update button icon
+                previewButton.innerHTML = '<i class="fas fa-eye"></i>';
+                previewButton.title = 'Preview Note';
             }
         }
 
