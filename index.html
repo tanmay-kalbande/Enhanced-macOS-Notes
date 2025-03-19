@@ -1185,7 +1185,9 @@
         function updateNote() {
             if (activeNote !== null) {
                 notes[activeNote].title = noteTitle.value;
-                notes[activeNote].content = noteContent.value;
+                notes[activeNote].content = isPreviewMode ?
+                    noteContent.getAttribute('data-original') :
+                    noteContent.value;
                 notes[activeNote].timestamp = new Date().toISOString();
                 saveNotes();
                 loadNotes();
@@ -1219,13 +1221,19 @@
 
         // Update word count
         function updateWordCount() {
-            const words = noteContent.value.trim().split(/\s+/);
+            const content = isPreviewMode ?
+                noteContent.getAttribute('data-original') :
+                noteContent.value;
+            const words = content ? content.trim().split(/\s+/).filter(word => word.length > 0) : [];
             wordCount.textContent = `${words.length} words`;
         }
 
         // Update reading time
         function updateReadingTime() {
-            const words = noteContent.value.trim().split(/\s+/);
+            const content = isPreviewMode ?
+                noteContent.getAttribute('data-original') :
+                noteContent.value;
+            const words = content ? content.trim().split(/\s+/).filter(word => word.length > 0) : [];
             const minutes = Math.ceil(words.length / 200);
             readingTime.textContent = `${minutes} min read`;
         }
@@ -1258,6 +1266,25 @@
                 window.URL.revokeObjectURL(url);
             }
         });
+
+        // Render notes based on search input
+        function renderNotes(filteredNotes) {
+            notesList.innerHTML = '';
+            filteredNotes.forEach((note, index) => {
+                const noteItem = document.createElement('li');
+                noteItem.classList.add('note-item');
+                noteItem.setAttribute('data-index', index);
+                noteItem.innerHTML = `
+                    <div class="note-item-title">${note.title}</div>
+                    <div class="note-item-preview">${note.content.substring(0, 50)}</div>
+                    <div class="note-item-footer">
+                        <span class="timestamp">${new Date(note.timestamp).toLocaleString()}</span>
+                    </div>
+                `;
+                noteItem.addEventListener('click', () => loadNote(index));
+                notesList.appendChild(noteItem);
+            });
+        }
 
         // Event listeners
         newNoteBtn.addEventListener('click', createNote);
