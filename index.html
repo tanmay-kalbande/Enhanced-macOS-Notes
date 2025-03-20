@@ -254,6 +254,7 @@
             margin-top: 16px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .new-note-btn {
@@ -272,10 +273,39 @@
             gap: 8px;
             transition: background 0.15s;
             letter-spacing: 0.3px;
+            min-width: 100px;
         }
 
         .new-note-btn:hover {
             background: var(--accent-hover);
+        }
+
+        .export-import-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .export-all-btn, .import-btn {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: background 0.15s;
+        }
+
+        .export-all-btn:hover, .import-btn:hover {
+            background: rgba(255,255,255,0.15);
         }
 
         .main-editor {
@@ -459,38 +489,6 @@
             gap: 12px;
         }
 
-        .formatting-toolbar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            padding: 8px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .format-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.15s;
-            font-size: 14px;
-        }
-
-        .format-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: var(--text-primary);
-        }
-
-        .format-btn.active {
-            background: var(--accent-color);
-            color: white;
-        }
-
         .action-btn {
             background: transparent;
             border: none;
@@ -520,6 +518,40 @@
 
         .delete-note-btn:hover {
             background: rgba(255, 95, 87, 0.1);
+        }
+
+        /* File input for import */
+        .import-file-input {
+            display: none;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--accent-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .notification.error {
+            background: #ff5f57;
         }
 
         /* Responsive Design */
@@ -568,17 +600,6 @@
                 font-size: 12px;
             }
 
-            .formatting-toolbar {
-                overflow-x: auto;
-                padding: 6px;
-                gap: 4px;
-            }
-
-            .format-btn {
-                padding: 6px 8px;
-                font-size: 13px;
-            }
-
             .overlay {
                 display: none;
                 position: fixed;
@@ -596,6 +617,14 @@
 
             .toolbar {
                 padding: 6px 12px;
+            }
+
+            .sidebar-footer {
+                flex-direction: column;
+            }
+
+            .export-import-container {
+                flex-direction: row;
             }
         }
 
@@ -783,6 +812,13 @@
             color: var(--text-secondary);
             font-size: 12px;
         }
+
+        /* Highlighted match in search results */
+        .highlight-match {
+            background-color: rgba(255, 203, 107, 0.4);
+            border-radius: 2px;
+            padding: 0 2px;
+        }
     </style>
 </head>
 <body>
@@ -813,6 +849,17 @@
                         <i class="fas fa-plus"></i>
                         <span>New Note</span>
                     </button>
+                    <div class="export-import-container">
+                        <button class="export-all-btn">
+                            <i class="fas fa-file-export"></i>
+                            <span>Export All</span>
+                        </button>
+                        <button class="import-btn">
+                            <i class="fas fa-file-import"></i>
+                            <span>Import</span>
+                        </button>
+                        <input type="file" class="import-file-input" accept=".json">
+                    </div>
                 </div>
             </div>
             <div class="main-editor">
@@ -822,17 +869,6 @@
                     <p>Select a note from the sidebar or create a new one.</p>
                 </div>
                 <div class="editor-container">
-                    <div class="formatting-toolbar">
-                        <button class="format-btn" data-format="heading"><i class="fas fa-heading"></i></button>
-                        <button class="format-btn" data-format="bold"><i class="fas fa-bold"></i></button>
-                        <button class="format-btn" data-format="italic"><i class="fas fa-italic"></i></button>
-                        <button class="format-btn" data-format="underline"><i class="fas fa-underline"></i></button>
-                        <button class="format-btn" data-format="list-ul"><i class="fas fa-list-ul"></i></button>
-                        <button class="format-btn" data-format="list-ol"><i class="fas fa-list-ol"></i></button>
-                        <button class="format-btn" data-format="code"><i class="fas fa-code"></i></button>
-                        <button class="format-btn" data-format="link"><i class="fas fa-link"></i></button>
-                        <button class="format-btn" data-format="quote"><i class="fas fa-quote-right"></i></button>
-                    </div>
                     <input type="text" class="note-title" placeholder="Title">
                     <textarea class="note-content" placeholder="Start writing..."></textarea>
                 </div>
@@ -847,10 +883,15 @@
             </div>
             <div class="actions">
                 <button class="action-btn theme-switch" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-                <button class="action-btn" title="Export Note"><i class="fas fa-file-export"></i></button>
+                <button class="action-btn export-note-btn" title="Export Note"><i class="fas fa-file-export"></i></button>
                 <button class="action-btn delete-note-btn" title="Delete Note"><i class="fas fa-trash"></i></button>
             </div>
         </div>
+    </div>
+
+    <div class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span class="notification-message"></span>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
@@ -872,255 +913,30 @@
         const searchInput = document.querySelector('.search-input');
         const wordCount = document.querySelector('.word-count');
         const readingTime = document.querySelector('.reading-time');
-        const formatButtons = document.querySelectorAll('.format-btn');
-        const previewButton = document.createElement('button');
-        previewButton.classList.add('action-btn');
-        previewButton.title = 'Preview Note';
-        previewButton.innerHTML = '<i class="fas fa-eye"></i>';
-        document.querySelector('.actions').prepend(previewButton);
+        const exportAllBtn = document.querySelector('.export-all-btn');
+        const importBtn = document.querySelector('.import-btn');
+        const importFileInput = document.querySelector('.import-file-input');
+        const notification = document.querySelector('.notification');
+        const notificationMessage = document.querySelector('.notification-message');
+        const exportNoteBtn = document.querySelector('.export-note-btn');
 
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
         let activeNote = null;
         let darkMode = localStorage.getItem('darkMode') !== 'false';
-        let isPreviewMode = false;
+        let searchTimeout = null;
 
-        // Convert Markdown-like syntax to HTML
-        function convertToHTML(markdown) {
-            // First escape any HTML entities to prevent them from being rendered as HTML
-            function escapeHTML(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+        // Show notification
+        function showNotification(message, isError = false) {
+            notification.classList.remove('error');
+            if (isError) {
+                notification.classList.add('error');
             }
+            notificationMessage.textContent = message;
+            notification.classList.add('show');
 
-            // Function to unescape HTML for code blocks
-            function unescapeHTML(html) {
-                const div = document.createElement('div');
-                div.innerHTML = html;
-                return div.textContent;
-            }
-
-            let html = escapeHTML(markdown);
-
-            // Handle code blocks first (so we don't process markdown inside them)
-            const codeBlocks = [];
-            html = html.replace(/```([\s\S]*?)```/g, function(match, code) {
-                const id = `CODE_BLOCK_${codeBlocks.length}`;
-                // Detect language if specified
-                const firstLine = code.trim().split('\n')[0];
-                let language = '';
-                let codeContent = code;
-
-                if (firstLine && !firstLine.includes(' ')) {
-                    language = firstLine;
-                    codeContent = code.substring(firstLine.length).trim();
-                }
-
-                // Store the code block for later
-                codeBlocks.push({
-                    id: id,
-                    language: language,
-                    code: unescapeHTML(codeContent) // Use the raw code
-                });
-
-                // Return a placeholder
-                return id;
-            });
-
-            // Handle inline code
-            const inlineCode = [];
-            html = html.replace(/`([^`]+)`/g, function(match, code) {
-                const id = `INLINE_CODE_${inlineCode.length}`;
-                inlineCode.push({
-                    id: id,
-                    code: unescapeHTML(code)
-                });
-                return id;
-            });
-
-            // Process Markdown
-
-            // Headings
-            html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-            html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-            html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-
-            // Bold
-            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-            // Italic
-            html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-            // Underline
-            html = html.replace(/\_\_(.+?)\_\_/g, '<u>$1</u>');
-
-            // Blockquote
-            html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-
-            // Unordered lists
-            let listMatches = html.match(/^- (.+)$/gm);
-            if (listMatches) {
-                html = html.replace(/^- (.+)$/gm, '<li>$1</li>');
-                html = html.replace(/(<li>.+<\/li>\n)+/g, '<ul>$&</ul>');
-            }
-
-            // Ordered lists
-            listMatches = html.match(/^\d+\. (.+)$/gm);
-            if (listMatches) {
-                html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-                html = html.replace(/(<li>.+<\/li>\n)+/g, '<ol>$&</ol>');
-            }
-
-            // Links
-            html = html.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>');
-
-            // Replace code block placeholders with actual HTML
-            codeBlocks.forEach(block => {
-                let codeHtml = '';
-                if (block.language) {
-                    codeHtml = `<pre><code class="language-${block.language}">${block.code}</code></pre>`;
-                } else {
-                    codeHtml = `<pre><code>${block.code}</code></pre>`;
-                }
-                html = html.replace(block.id, codeHtml);
-            });
-
-            // Replace inline code placeholders
-            inlineCode.forEach(code => {
-                html = html.replace(code.id, `<code>${code.code}</code>`);
-            });
-
-            // Handle line breaks properly
-            html = html.replace(/\n/g, '<br>');
-
-            return html;
-        }
-
-        // Toggle between edit and preview modes
-        function togglePreviewMode() {
-            isPreviewMode = !isPreviewMode;
-
-            if (isPreviewMode) {
-                // Create a temporary div to hold the HTML content
-                const previewDiv = document.createElement('div');
-                previewDiv.className = 'note-content preview-mode';
-                previewDiv.style.flex = '1';
-                previewDiv.style.overflow = 'auto';
-                previewDiv.style.padding = '16px';
-
-                // Save the original textarea content
-                const originalContent = noteContent.value;
-                previewDiv.setAttribute('data-original', originalContent);
-
-                // Convert the content to HTML
-                previewDiv.innerHTML = convertToHTML(originalContent);
-
-                // Apply syntax highlighting to code blocks
-                previewDiv.querySelectorAll('pre code').forEach((block) => {
-                    Prism.highlightElement(block);
-                });
-
-                // Replace the textarea with our div
-                const parent = noteContent.parentNode;
-                parent.replaceChild(previewDiv, noteContent);
-                noteContent = previewDiv;
-
-                // Update button icon
-                previewButton.innerHTML = '<i class="fas fa-edit"></i>';
-                previewButton.title = 'Edit Note';
-            } else {
-                // Get the original content
-                const originalContent = noteContent.getAttribute('data-original');
-
-                // Create a new textarea and restore the original content
-                const editTextarea = document.createElement('textarea');
-                editTextarea.className = 'note-content';
-                editTextarea.style.flex = '1';
-                editTextarea.style.border = 'none';
-                editTextarea.style.resize = 'none';
-                editTextarea.style.background = 'none';
-                editTextarea.style.color = 'var(--text-primary)';
-                editTextarea.style.fontSize = '16px';
-                editTextarea.style.lineHeight = '1.7';
-                editTextarea.style.padding = '8px';
-                editTextarea.style.width = '100%';
-                editTextarea.placeholder = 'Start writing...';
-
-                // Set the value to the original markdown content
-                editTextarea.value = originalContent;
-
-                // Add the event listener for changes
-                editTextarea.addEventListener('input', () => {
-                    updateNote();
-                    updateWordCount();
-                    updateReadingTime();
-                });
-
-                // Replace the preview div with our textarea
-                const parent = noteContent.parentNode;
-                parent.replaceChild(editTextarea, noteContent);
-                noteContent = editTextarea;
-
-                // Update button icon
-                previewButton.innerHTML = '<i class="fas fa-eye"></i>';
-                previewButton.title = 'Preview Note';
-            }
-        }
-
-        // Format text in the editor
-        function formatText(format) {
-            if (isPreviewMode) return;
-
-            const textarea = noteContent;
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const selectedText = textarea.value.substring(start, end);
-            let formattedText = '';
-            let cursorOffset = 0;
-
-            switch(format) {
-                case 'heading':
-                    formattedText = `## ${selectedText}`;
-                    cursorOffset = 3;
-                    break;
-                case 'bold':
-                    formattedText = `**${selectedText}**`;
-                    cursorOffset = 2;
-                    break;
-                case 'italic':
-                    formattedText = `*${selectedText}*`;
-                    cursorOffset = 1;
-                    break;
-                case 'underline':
-                    formattedText = `__${selectedText}__`;
-                    cursorOffset = 2;
-                    break;
-                case 'list-ul':
-                    formattedText = `- ${selectedText}`;
-                    cursorOffset = 2;
-                    break;
-                case 'list-ol':
-                    formattedText = `1. ${selectedText}`;
-                    cursorOffset = 3;
-                    break;
-                case 'code':
-                    formattedText = `\`${selectedText}\``;
-                    cursorOffset = 1;
-                    break;
-                case 'link':
-                    formattedText = `[${selectedText}](http://)`;
-                    cursorOffset = 7;
-                    break;
-                case 'quote':
-                    formattedText = `> ${selectedText}`;
-                    cursorOffset = 2;
-                    break;
-            }
-
-            textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
-            textarea.selectionStart = start + cursorOffset;
-            textarea.selectionEnd = start + cursorOffset + selectedText.length;
-            textarea.focus();
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
         }
 
         // Load notes from local storage
@@ -1131,7 +947,7 @@
                 noteItem.classList.add('note-item');
                 noteItem.setAttribute('data-index', index);
                 noteItem.innerHTML = `
-                    <div class="note-item-title">${note.title}</div>
+                    <div class="note-item-title">${note.title || 'Untitled'}</div>
                     <div class="note-item-preview">${note.content.substring(0, 50)}</div>
                     <div class="note-item-footer">
                         <span class="timestamp">${new Date(note.timestamp).toLocaleString()}</span>
@@ -1140,13 +956,14 @@
                 noteItem.addEventListener('click', () => loadNote(index));
                 notesList.appendChild(noteItem);
             });
-            notesCount.textContent = `${notes.length} notes`;
+            notesCount.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
         }
 
         // Load a specific note
         function loadNote(index) {
             activeNote = index;
             const note = notes[index];
+
             noteTitle.value = note.title;
             noteContent.value = note.content;
             editorPlaceholder.style.display = 'none';
@@ -1157,8 +974,17 @@
             // Highlight the selected note
             const noteItems = document.querySelectorAll('.note-item');
             noteItems.forEach((item, idx) => {
-                item.classList.toggle('selected', idx === index);
+                if (idx === activeNote) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
             });
+
+            // If sidebar is open on mobile, close it
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
         }
 
         // Create a new note
@@ -1185,9 +1011,7 @@
         function updateNote() {
             if (activeNote !== null) {
                 notes[activeNote].title = noteTitle.value;
-                notes[activeNote].content = isPreviewMode ?
-                    noteContent.getAttribute('data-original') :
-                    noteContent.value;
+                notes[activeNote].content = noteContent.value;
                 notes[activeNote].timestamp = new Date().toISOString();
                 saveNotes();
                 loadNotes();
@@ -1197,10 +1021,13 @@
         // Delete the current note
         function deleteNote() {
             if (activeNote !== null) {
-                notes.splice(activeNote, 1);
-                saveNotes();
-                loadNotes();
-                resetEditor();
+                const confirmDelete = confirm("Are you sure you want to delete this note?");
+                if (confirmDelete) {
+                    notes.splice(activeNote, 1);
+                    saveNotes();
+                    loadNotes();
+                    resetEditor();
+                }
             }
         }
 
@@ -1213,27 +1040,18 @@
             activeNote = null;
             updateWordCount();
             updateReadingTime();
-            isPreviewMode = false;
-            noteContent.style.border = '';
-            noteContent.style.padding = '8px';
-            noteContent.style.cursor = 'text';
-            noteContent.style.color = 'var(--text-primary)'; // Ensure text color is set correctly
         }
 
         // Update word count
         function updateWordCount() {
-            const content = isPreviewMode ?
-                noteContent.getAttribute('data-original') :
-                noteContent.value;
+            const content = noteContent.value;
             const words = content ? content.trim().split(/\s+/).filter(word => word.length > 0) : [];
             wordCount.textContent = `${words.length} words`;
         }
 
         // Update reading time
         function updateReadingTime() {
-            const content = isPreviewMode ?
-                noteContent.getAttribute('data-original') :
-                noteContent.value;
+            const content = noteContent.value;
             const words = content ? content.trim().split(/\s+/).filter(word => word.length > 0) : [];
             const minutes = Math.ceil(words.length / 200);
             readingTime.textContent = `${minutes} min read`;
@@ -1252,8 +1070,22 @@
             overlay.classList.toggle('active');
         }
 
-        // Export note as a text file
-        document.querySelector('.action-btn[title="Export Note"]').addEventListener('click', () => {
+        // Export all notes as a JSON file
+        exportAllBtn.addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'notes.json';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showNotification('All notes exported successfully!');
+        });
+
+        // Export the current note as a text file
+        exportNoteBtn.addEventListener('click', () => {
             if (activeNote !== null) {
                 const note = notes[activeNote];
                 const blob = new Blob([note.content], { type: 'text/plain' });
@@ -1261,29 +1093,67 @@
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = `${note.title}.txt`;
+                a.download = `${note.title || 'Untitled'}.txt`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
+                showNotification('Note exported successfully!');
+            }
+        });
+
+        // Import notes from a JSON file
+        importBtn.addEventListener('click', () => {
+            importFileInput.click();
+        });
+
+        importFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedNotes = JSON.parse(e.target.result);
+                        if (Array.isArray(importedNotes)) {
+                            notes = importedNotes;
+                            saveNotes();
+                            loadNotes();
+                            resetEditor();
+                            showNotification('Notes imported successfully!');
+                        } else {
+                            showNotification('Invalid file format.', true);
+                        }
+                    } catch (error) {
+                        showNotification('Failed to import notes.', true);
+                    }
+                };
+                reader.readAsText(file);
             }
         });
 
         // Render notes based on search input
         function renderNotes(filteredNotes) {
             notesList.innerHTML = '';
-            filteredNotes.forEach((note, index) => {
+            filteredNotes.forEach((note, i) => {
+                // Find the actual index in the original notes array
+                const originalIndex = notes.findIndex(n => n === note);
+
                 const noteItem = document.createElement('li');
                 noteItem.classList.add('note-item');
-                noteItem.setAttribute('data-index', index);
+                noteItem.setAttribute('data-index', originalIndex);
                 noteItem.innerHTML = `
-                    <div class="note-item-title">${note.title}</div>
+                    <div class="note-item-title">${note.title || 'Untitled'}</div>
                     <div class="note-item-preview">${note.content.substring(0, 50)}</div>
                     <div class="note-item-footer">
                         <span class="timestamp">${new Date(note.timestamp).toLocaleString()}</span>
                     </div>
                 `;
-                noteItem.addEventListener('click', () => loadNote(index));
+                noteItem.addEventListener('click', () => loadNote(originalIndex));
                 notesList.appendChild(noteItem);
+
+                // Maintain selection state
+                if (originalIndex === activeNote) {
+                    noteItem.classList.add('selected');
+                }
             });
         }
 
@@ -1299,20 +1169,16 @@
         themeSwitch.addEventListener('click', toggleDarkMode);
         sidebarToggle.addEventListener('click', toggleSidebar);
         overlay.addEventListener('click', toggleSidebar);
-        formatButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                const format = button.getAttribute('data-format');
-                formatText(format);
-            });
-        });
-        previewButton.addEventListener('click', togglePreviewMode);
         searchInput.addEventListener('input', () => {
-            const query = searchInput.value.toLowerCase();
-            const filteredNotes = notes.filter(note =>
-                note.title.toLowerCase().includes(query) ||
-                note.content.toLowerCase().includes(query)
-            );
-            renderNotes(filteredNotes);
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = searchInput.value.toLowerCase();
+                const filteredNotes = notes.filter(note =>
+                    note.title.toLowerCase().includes(query) ||
+                    note.content.toLowerCase().includes(query)
+                );
+                renderNotes(filteredNotes);
+            }, 300);
         });
 
         // Initial load
@@ -1323,6 +1189,40 @@
 
         // Syntax highlighting
         Prism.highlightAll();
+
+        // Add auto-save functionality
+        let autoSaveTimer;
+        noteContent.addEventListener('input', () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                if (activeNote !== null) {
+                    const saveIndicator = document.createElement('div');
+                    saveIndicator.className = 'save-indicator';
+                    saveIndicator.textContent = 'Saved';
+                    saveIndicator.style.position = 'fixed';
+                    saveIndicator.style.bottom = '20px';
+                    saveIndicator.style.right = '20px';
+                    saveIndicator.style.background = 'var(--accent-color)';
+                    saveIndicator.style.color = 'white';
+                    saveIndicator.style.padding = '8px 16px';
+                    saveIndicator.style.borderRadius = '4px';
+                    saveIndicator.style.opacity = '0';
+                    saveIndicator.style.transition = 'opacity 0.3s';
+
+                    document.body.appendChild(saveIndicator);
+                    setTimeout(() => {
+                        saveIndicator.style.opacity = '1';
+                    }, 10);
+
+                    setTimeout(() => {
+                        saveIndicator.style.opacity = '0';
+                        setTimeout(() => {
+                            document.body.removeChild(saveIndicator);
+                        }, 300);
+                    }, 2000);
+                }
+            }, 1000);
+        });
     </script>
 </body>
 </html>
