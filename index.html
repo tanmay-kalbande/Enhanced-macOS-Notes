@@ -25,9 +25,9 @@
             --quote-color: #98c379;
             --link-color: #61afef;
             --highlight-color: rgba(255, 203, 107, 0.2);
-            --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
-            --font-mono: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace;
             --editor-padding: 24px;
         }
 
@@ -128,7 +128,7 @@
         }
 
         .sidebar {
-            width: 280px;
+            width: 295px;
             border-right: 1px solid var(--border-color);
             padding: 16px;
             background: var(--sidebar-bg);
@@ -161,10 +161,12 @@
         .search-bar {
             margin-bottom: 16px;
             position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .search-input {
-            width: 100%;
+            flex: 1;
             padding: 8px 12px 8px 32px;
             border-radius: 8px;
             background: rgba(255,255,255,0.1);
@@ -212,16 +214,8 @@
             background: rgba(255,255,255,0.05);
         }
 
-        .note-item.selected {
-            background: var(--selection-bg);
-        }
-
-        .note-item.selected:hover {
-            background: var(--selection-hover);
-        }
-
         .note-item-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
@@ -321,10 +315,10 @@
             background: none;
             border: none;
             color: var(--text-primary);
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 22px;
+            font-weight: 600;
             font-family: var(--font-heading);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             padding: 8px;
             width: 100%;
             transition: background 0.15s;
@@ -530,11 +524,11 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: var(--accent-color);
+            background: #333;
             color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            padding: 16px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.3s, transform 0.3s;
@@ -552,6 +546,14 @@
 
         .notification.error {
             background: #ff5f57;
+        }
+
+        .notification i {
+            font-size: 20px;
+        }
+
+        .notification-message {
+            flex: 1;
         }
 
         /* Responsive Design */
@@ -819,6 +821,86 @@
             border-radius: 2px;
             padding: 0 2px;
         }
+
+        /* Search help tooltip */
+        .search-help {
+            position: relative;
+            margin-left: 8px;
+        }
+
+        .search-help-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            border-radius: 50%;
+            transition: color 0.2s;
+        }
+
+        .search-help-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .search-help-tooltip {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            width: 250px;
+            background: var(--sidebar-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 100;
+            color: var(--text-primary);
+            font-size: 13px;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .search-help:hover .search-help-tooltip {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .search-help-tooltip h4 {
+            margin-bottom: 8px;
+            color: var(--accent-color);
+        }
+
+        .search-help-tooltip ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 10px;
+        }
+
+        .search-help-tooltip li {
+            margin-bottom: 6px;
+        }
+
+        .search-help-tooltip code {
+            background: rgba(0,0,0,0.2);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+
+        .search-help-tooltip p {
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        /* Update the search input placeholder to hint at the new capabilities */
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -841,7 +923,20 @@
                 </div>
                 <div class="search-bar">
                     <span class="search-icon"><i class="fas fa-search"></i></span>
-                    <input type="text" class="search-input" placeholder="Search notes...">
+                    <input type="text" class="search-input" placeholder="Search notes... (try 'quotes' or +required)">
+                    <div class="search-help">
+                        <button class="search-help-btn" title="Search Help">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                        <div class="search-help-tooltip">
+                            <h4>Advanced Search</h4>
+                            <ul>
+                                <li><code>"exact phrase"</code> - Search for exact phrase</li>
+                                <li><code>term1 term2</code> - Match either term</li>
+                            </ul>
+                            <p>Example: <code>"action items" meeting</code></p>
+                        </div>
+                    </div>
                 </div>
                 <ul class="notes-list"></ul>
                 <div class="sidebar-footer">
@@ -919,6 +1014,8 @@
         const notification = document.querySelector('.notification');
         const notificationMessage = document.querySelector('.notification-message');
         const exportNoteBtn = document.querySelector('.export-note-btn');
+        const searchHelpBtn = document.querySelector('.search-help-btn');
+        const searchHelpTooltip = document.querySelector('.search-help-tooltip');
 
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
         let activeNote = null;
@@ -970,16 +1067,6 @@
             editorContainer.style.display = 'flex';
             updateWordCount();
             updateReadingTime();
-
-            // Highlight the selected note
-            const noteItems = document.querySelectorAll('.note-item');
-            noteItems.forEach((item, idx) => {
-                if (idx === activeNote) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
-            });
 
             // If sidebar is open on mobile, close it
             if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
@@ -1133,27 +1220,39 @@
         // Render notes based on search input
         function renderNotes(filteredNotes) {
             notesList.innerHTML = '';
+            const query = searchInput.value.toLowerCase().trim();
+            const searchTerms = query ? query.split(/\s+/) : [];
+
             filteredNotes.forEach((note, i) => {
                 // Find the actual index in the original notes array
                 const originalIndex = notes.findIndex(n => n === note);
+
+                let title = note.title || 'Untitled';
+                let content = note.content.substring(0, 50);
+
+                // Highlight matching terms in title and preview
+                if (searchTerms.length > 0) {
+                    searchTerms.forEach(term => {
+                        if (!term) return;
+
+                        const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                        title = title.replace(regex, '<span class="highlight-match">$1</span>');
+                        content = content.replace(regex, '<span class="highlight-match">$1</span>');
+                    });
+                }
 
                 const noteItem = document.createElement('li');
                 noteItem.classList.add('note-item');
                 noteItem.setAttribute('data-index', originalIndex);
                 noteItem.innerHTML = `
-                    <div class="note-item-title">${note.title || 'Untitled'}</div>
-                    <div class="note-item-preview">${note.content.substring(0, 50)}</div>
+                    <div class="note-item-title">${title}</div>
+                    <div class="note-item-preview">${content}</div>
                     <div class="note-item-footer">
                         <span class="timestamp">${new Date(note.timestamp).toLocaleString()}</span>
                     </div>
                 `;
                 noteItem.addEventListener('click', () => loadNote(originalIndex));
                 notesList.appendChild(noteItem);
-
-                // Maintain selection state
-                if (originalIndex === activeNote) {
-                    noteItem.classList.add('selected');
-                }
             });
         }
 
@@ -1172,14 +1271,297 @@
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                const query = searchInput.value.toLowerCase();
-                const filteredNotes = notes.filter(note =>
-                    note.title.toLowerCase().includes(query) ||
-                    note.content.toLowerCase().includes(query)
-                );
-                renderNotes(filteredNotes);
+                const query = searchInput.value.trim();
+
+                if (!query) {
+                    renderNotes(notes);
+                    notesCount.textContent = `${notes.length} note${notes.length !== 1 ? 's' : ''}`;
+                    return;
+                }
+
+                // Parse the search query into tokens
+                const tokens = parseSearchQuery(query);
+
+                // Filter notes based on the tokens
+                const searchResults = performTokenSearch(notes, tokens);
+
+                // Render the filtered notes
+                renderNotes(searchResults.map(result => result.note));
+
+                // Update the notes count with search results
+                notesCount.textContent = `${searchResults.length} of ${notes.length} notes`;
             }, 300);
         });
+
+        // Initialize the search help tooltip
+        searchInput.setAttribute('placeholder', 'Search notes... (try "quotes" or +required)');
+
+        // Optional: Add click functionality instead of hover
+        searchHelpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            searchHelpTooltip.classList.toggle('active');
+        });
+
+        // Close tooltip when clicking elsewhere
+        document.addEventListener('click', () => {
+            searchHelpTooltip.classList.remove('active');
+        });
+
+        /**
+         * Parse a search query into tokens with operators
+         * Supports:
+         * - Quoted phrases: "exact match"
+         * - Regular terms
+         */
+        function parseSearchQuery(query) {
+            const tokens = [];
+            let current = '';
+            let inQuotes = false;
+
+            // Helper to add current token to the tokens array
+            const addToken = (str, type = 'normal') => {
+                if (str) tokens.push({ text: str.toLowerCase(), type });
+            };
+
+            // Parse the query character by character
+            for (let i = 0; i < query.length; i++) {
+                const char = query[i];
+
+                if (char === '"') {
+                    if (inQuotes) {
+                        // End of a quoted phrase
+                        addToken(current, 'phrase');
+                        current = '';
+                        inQuotes = false;
+                    } else {
+                        // Start of a quoted phrase
+                        if (current) addToken(current);
+                        current = '';
+                        inQuotes = true;
+                    }
+                } else if (!inQuotes && (char === ' ' || char === '\t')) {
+                    // Space outside quotes means end of current token
+                    addToken(current);
+                    current = '';
+                } else {
+                    // Add character to current token
+                    current += char;
+                }
+            }
+
+            // Add the last token if there is one
+            if (current) {
+                if (inQuotes) {
+                    addToken(current, 'phrase');
+                } else {
+                    addToken(current);
+                }
+            }
+
+            // Process operators
+            return tokens.map(token => {
+                if (token.text.startsWith('+')) {
+                    return { text: token.text.substring(1), type: 'required' };
+                } else if (token.text.startsWith('-')) {
+                    return { text: token.text.substring(1), type: 'excluded' };
+                }
+                return token;
+            }).filter(token => token.text); // Remove empty tokens
+        }
+
+        /**
+         * Perform token-based search on notes
+         */
+        function performTokenSearch(notes, tokens) {
+            if (!tokens.length) return [];
+
+            return notes
+                .map(note => {
+                    const titleText = note.title.toLowerCase();
+                    const contentText = note.content.toLowerCase();
+                    let score = 0;
+                    let isMatch = true;
+
+                    // Check each token against the note
+                    tokens.forEach(token => {
+                        let tokenMatch = false;
+
+                        if (token.type === 'phrase') {
+                            // Exact phrase matching
+                            if (titleText.includes(token.text)) {
+                                score += 15;
+                                tokenMatch = true;
+                            }
+                            if (contentText.includes(token.text)) {
+                                score += 10;
+                                tokenMatch = true;
+                            }
+                        } else {
+                            // Word boundary check for more precise matching
+                            const titleMatches = findWordMatches(titleText, token.text);
+                            const contentMatches = findWordMatches(contentText, token.text);
+
+                            if (titleMatches.length > 0) {
+                                // Title matches are weighted higher
+                                score += titleMatches.reduce((sum, match) => sum + calculateMatchScore(match, true), 0);
+                                tokenMatch = true;
+                            }
+
+                            if (contentMatches.length > 0) {
+                                score += contentMatches.reduce((sum, match) => sum + calculateMatchScore(match, false), 0);
+                                tokenMatch = true;
+                            }
+                        }
+
+                        // Handle required and excluded tokens
+                        if (token.type === 'required' && !tokenMatch) {
+                            isMatch = false;
+                        } else if (token.type === 'excluded' && tokenMatch) {
+                            isMatch = false;
+                        }
+                    });
+
+                    return {
+                        note,
+                        score,
+                        isMatch
+                    };
+                })
+                .filter(result => result.isMatch)
+                .sort((a, b) => b.score - a.score);
+        }
+
+        /**
+         * Find all occurrences of a term in text with word boundary awareness
+         */
+        function findWordMatches(text, term) {
+            const matches = [];
+            const words = text.split(/\b/);
+            let index = 0;
+
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i].trim();
+                if (!word) {
+                    index += words[i].length;
+                    continue;
+                }
+
+                if (word === term) {
+                    // Exact match
+                    matches.push({
+                        word,
+                        index,
+                        type: 'exact'
+                    });
+                } else if (word.startsWith(term)) {
+                    // Prefix match
+                    matches.push({
+                        word,
+                        index,
+                        type: 'prefix'
+                    });
+                } else if (word.includes(term)) {
+                    // Substring match
+                    matches.push({
+                        word,
+                        index,
+                        type: 'substring'
+                    });
+                }
+
+                index += words[i].length;
+            }
+
+            return matches;
+        }
+
+        /**
+         * Calculate the score for a match based on match type and location
+         */
+        function calculateMatchScore(match, isTitle) {
+            // Base scores
+            const locationMultiplier = isTitle ? 2 : 1;
+
+            // Score based on match type
+            switch (match.type) {
+                case 'exact':
+                    return 10 * locationMultiplier;
+                case 'prefix':
+                    return 5 * locationMultiplier;
+                case 'substring':
+                    return 2 * locationMultiplier;
+                default:
+                    return 1 * locationMultiplier;
+            }
+        }
+
+        /**
+         * Highlight search matches in rendered notes
+         * Update this function to highlight matches more precisely
+         */
+        function highlightMatches(text, tokens) {
+            if (!tokens || !tokens.length) return text;
+
+            let highlighted = text;
+
+            // Sort tokens by length (descending) to prevent nested highlights
+            const sortedTokens = [...tokens].sort((a, b) => b.text.length - a.text.length);
+
+            sortedTokens.forEach(token => {
+                // Skip excluded tokens for highlighting
+                if (token.type === 'excluded') return;
+
+                const regex = new RegExp(
+                    token.type === 'phrase'
+                        ? `(${escapeRegExp(token.text)})`
+                        : `\\b(${escapeRegExp(token.text)})\\w*\\b`,
+                    'gi'
+                );
+
+                highlighted = highlighted.replace(regex, '<span class="highlight-match">$1</span>');
+            });
+
+            return highlighted;
+        }
+
+        // Helper to escape special characters in regular expressions
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Update the renderNotes function to use the new highlighting
+        function renderNotes(filteredNotes) {
+            notesList.innerHTML = '';
+            const query = searchInput.value.trim();
+            const tokens = query ? parseSearchQuery(query) : [];
+
+            filteredNotes.forEach((note, i) => {
+                // Find the actual index in the original notes array
+                const originalIndex = notes.findIndex(n => n === note);
+
+                let title = note.title || 'Untitled';
+                let content = note.content.substring(0, 50);
+
+                // Highlight matching terms in title and preview
+                if (tokens.length > 0) {
+                    title = highlightMatches(title, tokens);
+                    content = highlightMatches(content, tokens);
+                }
+
+                const noteItem = document.createElement('li');
+                noteItem.classList.add('note-item');
+                noteItem.setAttribute('data-index', originalIndex);
+                noteItem.innerHTML = `
+                    <div class="note-item-title">${title}</div>
+                    <div class="note-item-preview">${content}</div>
+                    <div class="note-item-footer">
+                        <span class="timestamp">${new Date(note.timestamp).toLocaleString()}</span>
+                    </div>
+                `;
+                noteItem.addEventListener('click', () => loadNote(originalIndex));
+                notesList.appendChild(noteItem);
+            });
+        }
 
         // Initial load
         loadNotes();
@@ -1204,18 +1586,22 @@
                     saveIndicator.style.right = '20px';
                     saveIndicator.style.background = 'var(--accent-color)';
                     saveIndicator.style.color = 'white';
-                    saveIndicator.style.padding = '8px 16px';
-                    saveIndicator.style.borderRadius = '4px';
+                    saveIndicator.style.padding = '12px 20px';
+                    saveIndicator.style.borderRadius = '10px';
+                    saveIndicator.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
                     saveIndicator.style.opacity = '0';
-                    saveIndicator.style.transition = 'opacity 0.3s';
+                    saveIndicator.style.transition = 'opacity 0.3s, transform 0.3s';
+                    saveIndicator.style.transform = 'translateY(20px)';
 
                     document.body.appendChild(saveIndicator);
                     setTimeout(() => {
                         saveIndicator.style.opacity = '1';
+                        saveIndicator.style.transform = 'translateY(0)';
                     }, 10);
 
                     setTimeout(() => {
                         saveIndicator.style.opacity = '0';
+                        saveIndicator.style.transform = 'translateY(20px)';
                         setTimeout(() => {
                             document.body.removeChild(saveIndicator);
                         }, 300);
