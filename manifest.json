@@ -1,0 +1,20 @@
+{
+  "name": "Enhanced macOS Notes",
+  "short_name": "Notes",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#1f1f1f",
+  "theme_color": "#252A34",
+  "icons": [
+    {
+      "src": "resources/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "resources/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
