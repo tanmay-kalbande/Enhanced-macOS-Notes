@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced macOS Notes</title>
+    <title>Notes Pro - Search Refined</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css">
     <link rel="icon" href="resources/favicon.png" type="image/x-icon">
     <link rel="manifest" href="manifest.json">
@@ -19,87 +18,113 @@
                 <div class="traffic-light minimize"></div>
                 <div class="traffic-light expand"></div>
             </div>
-            <div class="window-title">Notes</div>
+            <div class="window-title">Notes Pro</div>
             <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+            <button class="action-btn theme-switch titlebar-theme-btn" title="Toggle Theme"><i class="fas fa-moon"></i></button>
         </div>
-        <div class="content">
-            <div class="overlay"></div>
+        <div class="content-area">
             <div class="sidebar">
                 <div class="sidebar-header">
-                    <h2 class="sidebar-title">Notes</h2>
-                    <span class="notes-count">0 notes</span>
-                </div>
-                <div class="search-bar">
-                    <span class="search-icon"><i class="fas fa-search"></i></span>
-                    <input type="text" class="search-input" placeholder="Search notes... (try 'quotes' or +required)">
-                    <div class="search-help">
-                        <button class="search-help-btn" title="Search Help">
-                            <i class="fas fa-question-circle"></i>
-                        </button>
-                        <div class="search-help-tooltip">
-                            <h4>Advanced Search</h4>
-                            <ul>
-                                <li><code>"exact phrase"</code> - Search for exact phrase</li>
-                                <li><code>term1 term2</code> - Match either term</li>
-                            </ul>
-                            <p>Example: <code>"action items" meeting</code></p>
+                     <button class="new-note-btn icon-btn" title="New Note">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="search-bar">
+                        <span class="search-icon"><i class="fas fa-search"></i></span>
+                        <input type="text" class="search-input" placeholder="Search notes...">
+                        <div class="search-help">
+                            <button class="search-help-btn" title="Search Help">
+                                <i class="fas fa-question-circle"></i>
+                            </button>
+                            <div class="search-help-tooltip">
+                                <h4>Advanced Search</h4>
+                                <ul>
+                                    <li><code>"exact phrase"</code></li>
+                                    <li><code>term1 term2</code> (match either)</li>
+                                    <li><code>+required</code></li>
+                                    <li><code>-excluded</code></li>
+                                </ul>
+                                <p>Example: <code>+"action items" -meeting</code></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <ul class="notes-list"></ul>
+                <div class="notes-list-container">
+                    <span class="notes-count">0 notes</span>
+                    <ul class="notes-list"></ul>
+                </div>
                 <div class="sidebar-footer">
-                    <button class="new-note-btn">
-                        <i class="fas fa-plus"></i>
-                        <span>New Note</span>
+                    <button class="import-btn icon-btn" title="Import Notes">
+                        <i class="fas fa-file-import"></i>
                     </button>
-                    <div class="export-import-container">
-                        <button class="export-all-btn">
-                            <i class="fas fa-file-export"></i>
-                            <span>Export All</span>
-                        </button>
-                        <button class="import-btn">
-                            <i class="fas fa-file-import"></i>
-                            <span>Import</span>
-                        </button>
-                        <input type="file" class="import-file-input" accept=".json">
-                    </div>
+                    <input type="file" class="import-file-input" accept=".json">
+                     <button class="export-all-btn icon-btn" title="Export All Notes">
+                        <i class="fas fa-file-export"></i>
+                    </button>
                 </div>
             </div>
-            <div class="main-editor">
+            <div class="resize-handle"></div>
+            <div class="main-area">
                 <div class="editor-placeholder">
                     <div class="placeholder-icon"><i class="fas fa-pen-to-square"></i></div>
                     <h2>No Note Selected</h2>
                     <p>Select a note from the sidebar or create a new one.</p>
                 </div>
-                <div class="editor-container">
-                    <input type="text" class="note-title" placeholder="Title">
-                    <textarea class="note-content" placeholder="Start writing..."></textarea>
+                <div class="editor-wrapper">
+                    <div class="editor-toolbar">
+
+                        <button class="toolbar-btn format-btn" data-command="bold" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                        <button class="toolbar-btn format-btn" data-command="italic" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                        <button class="toolbar-btn format-btn" data-command="underline" title="Underline (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                        <button class="toolbar-btn format-btn" data-command="strikeThrough" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
+                        <span class="toolbar-separator"></span>
+
+
+                        <button class="toolbar-btn format-btn" data-command="insertUnorderedList" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                        <button class="toolbar-btn format-btn" data-command="formatBlock" data-value="blockquote" title="Blockquote"><i class="fas fa-quote-left"></i></button>
+                         <span class="toolbar-separator"></span>
+
+
+                        <button class="toolbar-btn action-btn export-note-btn" title="Export Note"><i class="fas fa-file-export"></i></button>
+                        <button class="toolbar-btn action-btn delete-note-btn" title="Delete Note"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="editor-content">
+                        <input type="text" class="note-title" placeholder="Note Title">
+                        <div class="note-body" contenteditable="true" spellcheck="false" placeholder="Start writing..."></div>
+                    </div>
+                    <div class="editor-statusbar">
+                         <div class="statistics">
+                            <div class="statistic word-count"><i class="fas fa-text-width"></i> 0 words</div>
+                            <div class="statistic char-count"><i class="fas fa-pen-nib"></i> 0 characters</div>
+                            <div class="statistic reading-time"><i class="fas fa-clock"></i> 0 min read</div>
+                        </div>
+                        <span class="last-modified"></span>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="toolbar">
-            <div class="info-text">
-                <div class="statistics">
-                    <div class="statistic word-count"><i class="fas fa-font"></i> 0 words</div>
-                    <div class="statistic reading-time"><i class="fas fa-clock"></i> 0 min read</div>
+
+                <div class="search-results-view" style="display: none;">
+                     <div class="search-results-header">
+                        Search Results for "<span class="search-query-display"></span>"
+                    </div>
+                    <div class="search-results-list-container">
+
+                    </div>
+                     <div class="search-no-results" style="display: none;">
+                        No results found matching your query.
+                    </div>
                 </div>
-            </div>
-            <div class="actions">
-                <button class="action-btn theme-switch" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-                <button class="action-btn export-note-btn" title="Export Note"><i class="fas fa-file-export"></i></button>
-                <button class="action-btn delete-note-btn" title="Delete Note"><i class="fas fa-trash"></i></button>
+
             </div>
         </div>
     </div>
 
     <div class="notification">
-        <i class="fas fa-check-circle"></i>
+        <span class="notification-icon"><i class="fas fa-check-circle"></i></span>
         <span class="notification-message"></span>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <div class="overlay"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
