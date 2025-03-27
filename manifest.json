@@ -1,20 +1,19 @@
 {
-  "name": "Enhanced macOS Notes",
-  "short_name": "Notes",
-  "start_url": "/index.html",
+  "name": "Notes Pro - Offline Capable",
+  "short_name": "NotesPro",
+  "description": "An enhanced, installable note-taking application for desktop.",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#1f1f1f",
-  "theme_color": "#252A34",
+  "background_color": "#2d2d2d",
+  "theme_color": "#2d2d2d",
+  "orientation": "any",
+  "scope": ".",
   "icons": [
     {
       "src": "resources/favicon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "resources/favicon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
