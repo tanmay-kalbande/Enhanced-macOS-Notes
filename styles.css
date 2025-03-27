@@ -1,14 +1,13 @@
 :root {
-    /* --- Colors --- */
-    --bg-primary: #2d2d2d; /* Window background, toolbars */
-    --bg-secondary: #252525; /* Sidebar background */
-    --bg-tertiary: #1e1e1e; /* Editor background */
+    --bg-primary: #2d2d2d;
+    --bg-secondary: #252525;
+    --bg-tertiary: #1e1e1e;
     --bg-hover: #3a3a3a;
-    --bg-active: #454545; /* Used for active toolbar buttons */
+    --bg-active: #454545;
     --border-color: #404040;
     --text-primary: #e0e0e0;
     --text-secondary: #a0a0a0;
-    --text-tertiary: #707070; /* Placeholders, subtle text */
+    --text-tertiary: #707070;
     --accent-color: #007AFF;
     --accent-hover: #0056b3;
     --accent-text: #ffffff;
@@ -16,14 +15,12 @@
     --danger-hover: #d93b30;
     --selection-bg: #0d52bf;
     --highlight-match-bg: rgba(255, 203, 107, 0.3);
-    --highlight-match-text: inherit; /* Use default text color */
+    --highlight-match-text: inherit;
 
-    /* --- Fonts --- */
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
     --font-editor: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
     --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', monospace;
 
-    /* --- Dimensions & Spacing --- */
     --sidebar-width: 280px;
     --min-sidebar-width: 220px;
     --max-sidebar-width: 600px;
@@ -37,12 +34,10 @@
     --spacing-lg: 16px;
     --spacing-xl: 24px;
 
-    /* --- Transitions --- */
     --transition-fast: 0.15s ease-out;
     --transition-medium: 0.25s ease-out;
 }
 
-/* --- Light Mode Variables --- */
 body.light-mode {
     --bg-primary: #ffffff;
     --bg-secondary: #f7f7f7;
@@ -60,10 +55,9 @@ body.light-mode {
     --danger-hover: #d92c2c;
     --selection-bg: #007AFF;
     --highlight-match-bg: rgba(255, 211, 66, 0.4);
-    --highlight-match-text: #333; /* Darker text for light mode highlight */
+    --highlight-match-text: #333;
 }
 
-/* --- Base & Reset --- */
 * {
     margin: 0;
     padding: 0;
@@ -100,7 +94,6 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* --- Titlebar --- */
 .titlebar {
     height: var(--titlebar-height);
     padding: 0 var(--spacing-lg);
@@ -137,7 +130,6 @@ body {
     padding: var(--spacing-xs);
 }
 
-/* --- Utility Button Class --- */
 .action-btn {
     background: transparent;
     border: none;
@@ -153,7 +145,6 @@ body {
     color: var(--text-primary);
 }
 
-/* --- Icon Button Class (Sidebar Header/Footer) --- */
 .icon-btn {
     background: none;
     border: none;
@@ -170,14 +161,12 @@ body {
 .new-note-btn.icon-btn:hover { background: rgba(0, 122, 255, 0.15); color: var(--accent-hover); }
 
 
-/* --- Content Area (Sidebar + Main) --- */
 .content-area {
     flex: 1;
     display: flex;
     overflow: hidden;
 }
 
-/* --- Sidebar --- */
 .sidebar {
     width: var(--sidebar-width);
     min-width: var(--min-sidebar-width);
@@ -298,7 +287,7 @@ body {
     transition: color var(--transition-fast);
 }
 
-.highlight-match { /* Shared highlight style */
+.highlight-match {
     background-color: var(--highlight-match-bg);
     color: var(--highlight-match-text);
     border-radius: 3px;
@@ -321,7 +310,6 @@ body {
 }
 .import-file-input { display: none; }
 
-/* --- Resize Handle --- */
 .resize-handle {
     width: 5px;
     background: transparent;
@@ -334,20 +322,17 @@ body {
 .resize-handle:hover, .resize-handle.resizing { background: var(--accent-color); }
 .resize-handle::before { content: ""; position: absolute; left: -5px; top: 0; width: 15px; height: 100%; }
 
-/* --- Main Area --- */
 .main-area {
     flex: 1;
-    display: flex; /* Use flex */
+    display: flex;
     flex-direction: column;
     overflow: hidden;
     background: var(--bg-tertiary);
-    /* No position: relative needed */
 }
 
-/* --- Editor Placeholder --- */
 .editor-placeholder {
-    flex: 1; /* Takes space within flex container */
-    display: flex; /* Default display (controlled by JS) */
+    flex: 1;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -362,16 +347,14 @@ body {
 .editor-placeholder h2 { font-size: 18px; color: var(--text-secondary); margin-bottom: var(--spacing-sm); }
 .editor-placeholder p { font-size: 14px; }
 
-/* --- Editor Wrapper (when active) --- */
 .editor-wrapper {
-    flex: 1; /* Takes space within flex container */
-    display: none; /* Default hidden (controlled by JS) */
+    flex: 1;
+    display: none;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
 }
 
-/* --- Editor Toolbar --- */
 .editor-toolbar {
     height: var(--toolbar-height);
     padding: 0 var(--spacing-md);
@@ -411,7 +394,6 @@ body {
     margin: 0 var(--spacing-sm);
 }
 
-/* --- Editor Content Area --- */
 .editor-content {
     flex: 1;
     overflow-y: auto;
@@ -439,34 +421,36 @@ body {
 .note-title:focus { border-bottom-color: var(--accent-color); }
 .note-title::placeholder { color: var(--text-tertiary); font-weight: 500; }
 
-/* --- ContentEditable Body --- */
 .note-body {
     flex: 1;
     outline: none;
-    font-family: var(--font-editor);
-    font-size: 15px;
-    line-height: 1.75;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    line-height: 1.7;
     color: var(--text-primary);
     min-height: 100px;
     word-wrap: break-word;
 }
 
-/* Placeholder for ContentEditable */
 .note-body:empty::before {
     content: attr(placeholder);
     color: var(--text-tertiary);
     pointer-events: none;
     display: block;
+    font-family: var(--font-mono);
+    font-size: 6px;
+    line-height: 1.7;
 }
 
-/* Basic Rich Text Styling inside .note-body */
 .note-body h1, .note-body h2, .note-body h3,
 .note-body h4, .note-body h5, .note-body h6 {
+    font-family: var(--font-editor);
     font-weight: 600; margin: 1.4em 0 0.7em; line-height: 1.3; color: var(--text-primary);
 }
 .note-body h1 { font-size: 1.8em; }
 .note-body h2 { font-size: 1.5em; }
 .note-body h3 { font-size: 1.3em; }
+
 .note-body a { color: var(--accent-color); text-decoration: none; }
 .note-body a:hover { text-decoration: underline; }
 .note-body blockquote {
@@ -474,11 +458,18 @@ body {
 }
 .note-body ul, .note-body ol { padding-left: 1.8em; margin: 1em 0; }
 .note-body li { margin-bottom: 0.5em; }
+
 .note-body code {
-    font-family: var(--font-mono); background: var(--bg-hover); padding: 3px 6px; border-radius: 4px; font-size: 0.88em; border: 1px solid var(--border-color); color: var(--text-secondary);
+    font-family: var(--font-mono);
+    background: var(--bg-hover);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
 }
 .note-body pre {
-    background: var(--bg-primary); border: 1px solid var(--border-color); padding: 1em; border-radius: var(--border-radius); overflow-x: auto; margin: 1.2em 0; font-family: var(--font-mono); font-size: 0.88em; line-height: 1.5;
+    background: var(--bg-primary); border: 1px solid var(--border-color); padding: 1em; border-radius: var(--border-radius); overflow-x: auto; margin: 1.2em 0; font-family: var(--font-mono); font-size: 0.9em; line-height: 1.5;
 }
 .note-body pre code { background: none; padding: 0; border: none; font-size: inherit; color: inherit; }
 .note-body hr { border: none; border-top: 1px solid var(--border-color); margin: 2.5em 0; }
@@ -488,7 +479,6 @@ body {
 .note-body s, .note-body strike { text-decoration: line-through; }
 
 
-/* --- Status Bar --- */
 .editor-statusbar {
     height: var(--statusbar-height);
     padding: 0 var(--spacing-lg);
@@ -506,10 +496,9 @@ body {
 .statistic i { font-size: 12px; color: var(--text-tertiary); }
 .last-modified { white-space: nowrap; }
 
-/* --- Search Results View (Main Area) --- */
 .search-results-view {
-    flex: 1; /* Takes space within flex container */
-    display: none; /* Default hidden (controlled by JS) */
+    flex: 1;
+    display: none;
     flex-direction: column;
     overflow: hidden;
     height: 100%;
@@ -562,7 +551,6 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-/* Title highlight */
 .search-result-note-title .highlight-match {
     background-color: var(--highlight-match-bg);
     color: var(--highlight-match-text);
@@ -585,7 +573,6 @@ body {
     word-wrap: break-word;
 }
 
-/* Snippet highlight */
 .search-result-snippet .highlight-match {
     background-color: var(--highlight-match-bg);
     color: var(--highlight-match-text);
@@ -595,16 +582,14 @@ body {
 }
 
 .search-no-results {
-    /* Centered within the list container */
     text-align: center;
-    padding: var(--spacing-xl) 0; /* Only vertical padding */
+    padding: var(--spacing-xl) 0;
     color: var(--text-tertiary);
     font-size: 16px;
     user-select: none;
 }
 
 
-/* --- Notification --- */
 .notification {
     position: fixed;
     bottom: var(--spacing-xl);
@@ -630,7 +615,6 @@ body {
 .notification-icon i { font-size: 18px; line-height: 1; }
 .notification-message { flex: 1; font-size: 13px; line-height: 1.4; }
 
-/* --- Custom scrollbar --- */
 ::-webkit-scrollbar { width: 9px; height: 9px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
@@ -638,10 +622,8 @@ body {
 body.light-mode ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-color: var(--bg-secondary); }
 body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); }
 
-/* --- Text highlighting --- */
 ::selection { background: var(--selection-bg); color: var(--accent-text); }
 
-/* --- Overlay (for Mobile Sidebar) --- */
 .overlay {
     display: none;
     position: fixed;
@@ -652,7 +634,6 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); 
 }
 .overlay.active { display: block; opacity: 1; }
 
-/* --- Responsive Design --- */
 @media (max-width: 768px) {
     body { padding: 0; align-items: stretch; }
     .window { border-radius: 0; height: 100vh; max-height: none; border: none; }
@@ -678,11 +659,39 @@ body.light-mode ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.28); 
     .main-area { width: 100%; flex: 1; }
     .editor-content { padding: var(--spacing-lg); }
     .note-title { font-size: 22px; }
-    .note-body { font-size: 15px; line-height: 1.7; }
+    .note-body { font-size: 14px; line-height: 1.7; }
     .editor-toolbar { padding: 0 var(--spacing-sm); gap: 1px; }
     .toolbar-btn { width: 34px; height: 34px; }
-    .editor-statusbar { padding: 0 var(--spacing-md); }
-    .statistics { gap: var(--spacing-md); }
+
+    .editor-statusbar {
+        height: auto;
+        min-height: calc(var(--statusbar-height) - 4px);
+        padding: 6px var(--spacing-md);
+        flex-wrap: wrap;
+        gap: var(--spacing-xs) var(--spacing-md);
+        justify-content: space-between;
+    }
+
+    .statistics {
+        gap: var(--spacing-md);
+        flex-basis: auto;
+    }
+
+    .statistic,
+    .last-modified {
+        font-size: 9.8px;
+        white-space: nowrap;
+    }
+
+    .statistics .reading-time {
+        display: none;
+    }
+
+    .last-modified {
+        text-align: right;
+        flex-grow: 1;
+    }
+
     .search-results-list-container { padding: var(--spacing-md); }
     .search-result-item { padding: var(--spacing-md); }
 }
