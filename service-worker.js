@@ -88,7 +88,9 @@ self.addEventListener('fetch', (event) => {
            return requestUrl.href === cacheFileUrl.href;
         } catch(e) {
             // Handle relative paths
-            return requestUrl.pathname.endsWith(fileUrl);
+            // Ensure the path *ends with* the fileUrl, handling potential leading slashes
+            // e.g., request /path/to/script.js should match fileUrl script.js
+            return requestUrl.pathname.endsWith('/' + fileUrl) || requestUrl.pathname === '/' + fileUrl;
         }
     });
 
@@ -101,11 +103,32 @@ self.addEventListener('fetch', (event) => {
                     return cachedResponse;
                 }
                 // console.log('[Service Worker] Not in cache, fetching from network:', event.request.url);
-                return fetch(event.request); // Fetch from network if not in cache
+                // Fetch from network if not in cache.
+                // Important: Also cache the fetched response for next time!
+                return fetch(event.request).then(networkResponse => {
+                    // Check if we received a valid response
+                    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic' && networkResponse.type !== 'cors') {
+                         // Don't cache invalid responses (like errors or opaque responses from cross-origin requests without CORS)
+                        return networkResponse;
+                    }
+
+                    // IMPORTANT: Clone the response. A response is a stream
+                    // and because we want the browser to consume the response
+                    // as well as the cache consuming the response, we need
+                    // to clone it so we have two streams.
+                    const responseToCache = networkResponse.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache);
+                        });
+
+                    return networkResponse; // Return the original network response to the browser
+                });
             }).catch(error => {
-                 console.error('[Service Worker] Error matching cache:', error);
+                 console.error('[Service Worker] Error fetching or caching:', error);
                  // Optional: Provide a generic offline fallback page
-                 // return caches.match('/offline.html');
+                 // return caches.match('/offline.html'); // Make sure offline.html is in CACHE_FILES if you use this
             })
         );
     } else {
@@ -121,7 +144,7 @@ self.addEventListener('fetch', (event) => {
             })
         );
         */
-        // Or just don't call event.respondWith() for pass-through
+        // Or just don't call event.respondWith() for pass-through (current behavior)
         return;
     }
 });
