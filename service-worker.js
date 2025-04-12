@@ -1,5 +1,5 @@
 // Define a cache name, version it for updates
-const CACHE_NAME = 'notes-pro-cache-v1.1'; // Increment version if you change cached files
+const CACHE_NAME = 'notes-pro-cache-v1.2'; // Increment version if you change cached files
 
 // List of files to cache for offline use (the "app shell")
 const CACHE_FILES = [
